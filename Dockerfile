@@ -7,4 +7,4 @@ RUN cargo build --release
 
 EXPOSE 3000
 
-CMD ["/usr/src/app/target/release/golinks"]
+CMD ["/usr/src/app/target/release/currencies"]
