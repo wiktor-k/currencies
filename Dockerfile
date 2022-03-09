@@ -15,6 +15,7 @@ RUN case "$TARGETPLATFORM" in \
     esac
 
 RUN rustup target add $(cat /target)
+RUN rustup component add rustfmt clippy
 
 WORKDIR /app
 
@@ -25,9 +26,16 @@ RUN mkdir .cargo
 RUN cargo vendor > .cargo/config
 
 COPY src ./src
+
+# Check code quality in one step
+RUN cargo fmt --all -- --check && \
+  cargo clippy -- -D warnings
+
 RUN cargo build --release --target $(cat /target)
 
 RUN cp target/$(cat /target)/release/main .
+
+RUN sha256sum main
 
 FROM alpine:3.15
 ENV \
