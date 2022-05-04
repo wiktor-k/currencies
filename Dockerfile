@@ -23,15 +23,15 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 
 RUN mkdir .cargo
-RUN cargo vendor > .cargo/config
+RUN cargo vendor --locked > .cargo/config
 
 COPY src ./src
 
 # Check code quality in one step
 RUN cargo fmt --all -- --check && \
-  cargo clippy -- -D warnings
+  cargo clippy --locked -- -D warnings
 
-RUN cargo build --release --target $(cat /target)
+RUN cargo build --locked --release --target $(cat /target)
 
 RUN cp target/$(cat /target)/release/main .
 
