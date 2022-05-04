@@ -2,6 +2,13 @@
 
 This is a sample application utilizing both =actix_web= and =awc=.
 
+The application retrieves rates of several currencies and outputs a
+JSON document.
+
+This later is being consumed by the Lametric Time device:
+
+[[./docs/lametric.jpg]]
+
 * Running
 
 =cargo run= will start the application listening on localhost's port 8080.
