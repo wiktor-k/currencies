@@ -17,6 +17,9 @@ rustls = "0.20.4"
 service-binding = "0.3.1"
 clap = { version = "3.1.18", features = ["derive", "env"] }
 
+[dev-dependencies]
+actix-rt = "2.7"
+
 # This is required by cargo vendor during docker builds
 [[bin]]
 path = "src/main.rs"
