@@ -8,7 +8,9 @@ use awc::{
     Client,
 };
 
+use clap::Parser;
 use serde::{Deserialize, Serialize};
+use service_binding::{Binding, Listener};
 
 #[derive(Debug, Deserialize)]
 struct Rate {
@@ -113,22 +115,37 @@ async fn healthz() -> impl Responder {
     "OK"
 }
 
+#[derive(Debug, Parser)]
+struct Args {
+    #[clap(
+        short = 'H',
+        long,
+        env = "HOST",
+        default_value = "tcp://127.0.0.1:8080"
+    )]
+    host: Binding,
+}
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    HttpServer::new(|| {
+    let args = Args::parse();
+
+    let server = HttpServer::new(|| {
         App::new()
             .app_data(Data::new(Client::default()))
             .route("/healthz", web::get().to(healthz))
             .route("/", web::get().to(render))
             .wrap(Logger::default())
-    })
-    .bind(std::env::var("BIND").unwrap_or_else(|_| "127.0.0.1:8080".into()))?
-    .run()
-    .await?;
+    });
 
-    Ok(())
+    match args.host.try_into()? {
+        Listener::Unix(listener) => server.listen_uds(listener),
+        Listener::Tcp(listener) => server.listen(listener),
+    }?
+    .run()
+    .await
 }
 
 #[cfg(test)]
