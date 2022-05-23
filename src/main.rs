@@ -10,6 +10,14 @@ struct Args {
         default_value = "tcp://127.0.0.1:8080"
     )]
     host: Binding,
+
+    #[clap(
+        short,
+        long,
+        env = "TARGET",
+        default_value = "https://api.nbp.pl/api/exchangerates/tables/A/"
+    )]
+    target: String,
 }
 
 #[tokio::main]
@@ -18,5 +26,5 @@ async fn main() -> std::io::Result<()> {
 
     let args = Args::parse();
 
-    currencies::start(args.host.try_into()?)?.await
+    currencies::start(args.target, args.host.try_into()?)?.await
 }

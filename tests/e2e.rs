@@ -1,6 +1,6 @@
 use currencies::start;
 use std::net::TcpListener;
-use wiremock::matchers::{header, method, path};
+use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[actix_rt::test]
@@ -22,7 +22,6 @@ async fn frames_test() -> std::io::Result<()> {
 
     Mock::given(method("GET"))
         .and(path("/source"))
-        .and(header("accept", "application/json"))
         .respond_with(ResponseTemplate::new(200).set_body_raw(
             r#"[
   {

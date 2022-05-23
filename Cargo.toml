@@ -19,6 +19,7 @@ clap = { version = "3.1.18", features = ["derive", "env"] }
 
 [dev-dependencies]
 actix-rt = "2.7"
+wiremock = "0.5"
 
 # This is required by cargo vendor during docker builds
 [[bin]]

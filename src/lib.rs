@@ -89,9 +89,9 @@ impl From<serde_json::Error> for Error {
     }
 }
 
-async fn render(client: Data<Client>) -> Result<HttpResponse, Error> {
+async fn render(target: Data<String>, client: Data<Client>) -> Result<HttpResponse, Error> {
     let tables = client
-        .get("https://api.nbp.pl/api/exchangerates/tables/A/")
+        .get(target.get_ref())
         .insert_header((
             "User-Agent",
             "currencies (+https://metacode.biz/@wiktor#currencies2)",
@@ -115,10 +115,11 @@ async fn healthz() -> impl Responder {
     "OK"
 }
 
-pub fn start(listener: Listener) -> std::io::Result<Server> {
-    let server = HttpServer::new(|| {
+pub fn start(target: String, listener: Listener) -> std::io::Result<Server> {
+    let server = HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Client::default()))
+            .app_data(Data::new(target.clone()))
             .route("/healthz", web::get().to(healthz))
             .route("/", web::get().to(render))
             .wrap(Logger::default())
