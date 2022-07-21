@@ -53,7 +53,10 @@ async fn frames_test() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
     let listener = TcpListener::bind("127.0.0.1:0")?;
-    let address = format!("http://127.0.0.1:{}/", listener.local_addr()?.port());
+    let address = format!(
+        "http://127.0.0.1:{}/currencies",
+        listener.local_addr()?.port()
+    );
     let _ = tokio::spawn(start(format!("{}/source", mock.uri()), listener.into())?);
     let client = awc::Client::default();
     let mut response = client.get(address).send().await.unwrap();
