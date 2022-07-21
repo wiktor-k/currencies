@@ -121,7 +121,7 @@ pub fn start(target: String, listener: Listener) -> std::io::Result<Server> {
             .app_data(Data::new(Client::default()))
             .app_data(Data::new(target.clone()))
             .route("/healthz", web::get().to(healthz))
-            .route("/", web::get().to(render))
+            .route("/currencies", web::get().to(render))
             .wrap(Logger::default())
     });
 
