@@ -31,6 +31,7 @@ COPY src ./src
 RUN cargo fmt --all -- --check && \
   cargo clippy --locked -- -D warnings
 
+ENV SOURCE_DATE_EPOCH=1
 RUN cargo build --locked --release --target $(cat /target)
 
 RUN cp target/$(cat /target)/release/main .

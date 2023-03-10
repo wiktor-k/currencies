@@ -21,6 +21,16 @@ clap = { version = "4.1.8", features = ["derive", "env"] }
 actix-rt = "2.8"
 wiremock = "0.5"
 
+[profile.release]
+incremental = false
+# flags from https://docs.near.org/sdk/rust/building/basics
+codegen-units = 1
+lto = true
+debug = false
+panic = "abort"
+# Opt into extra safety checks on arithmetic operations https://stackoverflow.com/a/64136471/249801
+overflow-checks = true
+
 # This is required by cargo vendor during docker builds
 [[bin]]
 path = "src/main.rs"
