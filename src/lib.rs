@@ -5,10 +5,20 @@ use actix_web::{
     App, HttpResponse, HttpServer, Responder,
 };
 use awc::Client;
-use serde::Serialize;
+
+use serde::{Deserialize, Serialize};
 use service_binding::Listener;
 
-json_typegen::json_typegen!("Tables", "src/tables.json");
+#[derive(Debug, Deserialize)]
+struct Rate {
+    code: String,
+    mid: f64,
+}
+
+#[derive(Debug, Deserialize)]
+struct Table {
+    rates: Vec<Rate>,
+}
 
 struct CurrencyIcon<'a>(&'a str, &'a str);
 
@@ -32,6 +42,7 @@ struct Frame<'a> {
 fn render_to_frames(tables: Vec<Table>) -> Vec<Frame<'static>> {
     let rates = tables.into_iter().flat_map(|table| table.rates);
     let mut frames = vec![];
+
     for rate in rates {
         for currency in CURRENCIES {
             if rate.code == currency.0 {
@@ -70,7 +81,7 @@ async fn render(target: Data<String>, client: Data<Client>) -> Result<HttpRespon
         .insert_header(("Accept", "application/json"))
         .send()
         .await?
-        .json::<Tables>()
+        .json::<Vec<Table>>()
         .await?;
 
     let frames = render_to_frames(tables);
@@ -112,13 +123,25 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_fransform() -> testresult::TestResult {
-        let tables = serde_json::from_reader(std::fs::File::open("src/tables.json")?)?;
+    fn test_transform() {
+        let tables = vec![Table {
+            rates: vec![Rate {
+                code: "USD".into(),
+                mid: 1.23,
+            }],
+        }];
         let frames = render_to_frames(tables);
-        assert_eq!(frames.len(), 3);
+        assert_eq!(frames.len(), 1);
         let frame = &frames[0];
-        assert_eq!(frame.text, "3.9571");
+        assert_eq!(frame.text, "1.2300");
         assert_eq!(frame.icon, "i4935");
+    }
+
+    #[test]
+    fn test_reading_known_good_sample() -> testresult::TestResult {
+        let tables: Vec<Table> =
+            serde_json::from_reader(std::fs::File::open("tests/tables.json")?)?;
+        assert_eq!(tables.len(), 1);
         Ok(())
     }
 }
