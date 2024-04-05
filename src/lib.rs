@@ -119,6 +119,7 @@ pub fn start(target: String, listener: Listener) -> std::io::Result<Server> {
     let server = match listener {
         Listener::Unix(listener) => server.listen_uds(listener),
         Listener::Tcp(listener) => server.listen(listener),
+        _ => return Err(std::io::Error::other("Unsupported listener type")),
     }?
     .run();
 
