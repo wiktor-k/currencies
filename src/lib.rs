@@ -9,19 +9,10 @@ use awc::{
     Client,
 };
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use service_binding::Listener;
 
-#[derive(Debug, Deserialize)]
-struct Rate {
-    code: String,
-    mid: f64,
-}
-
-#[derive(Debug, Deserialize)]
-struct Table {
-    rates: Vec<Rate>,
-}
+json_typegen::json_typegen!("Tables", "src/tables.json");
 
 struct CurrencyIcon<'a>(&'a str, &'a str);
 
@@ -45,7 +36,6 @@ struct Frame<'a> {
 fn render_to_frames(tables: Vec<Table>) -> Vec<Frame<'static>> {
     let rates = tables.into_iter().flat_map(|table| table.rates);
     let mut frames = vec![];
-
     for rate in rates {
         for currency in CURRENCIES {
             if rate.code == currency.0 {
@@ -99,7 +89,7 @@ async fn render(target: Data<String>, client: Data<Client>) -> Result<HttpRespon
         .insert_header(("Accept", "application/json"))
         .send()
         .await?
-        .json::<Vec<Table>>()
+        .json::<Tables>()
         .await?;
 
     let frames = render_to_frames(tables);
@@ -140,17 +130,13 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_fransform() {
-        let tables = vec![Table {
-            rates: vec![Rate {
-                code: "USD".into(),
-                mid: 1.23,
-            }],
-        }];
+    fn test_fransform() -> testresult::TestResult {
+        let tables = serde_json::from_reader(std::fs::File::open("src/tables.json")?)?;
         let frames = render_to_frames(tables);
-        assert_eq!(frames.len(), 1);
+        assert_eq!(frames.len(), 3);
         let frame = &frames[0];
-        assert_eq!(frame.text, "1.2300");
+        assert_eq!(frame.text, "3.9571");
         assert_eq!(frame.icon, "i4935");
+        Ok(())
     }
 }
