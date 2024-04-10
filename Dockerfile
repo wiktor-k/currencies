@@ -1,7 +1,7 @@
 FROM --platform=$BUILDPLATFORM rust:1.77 AS rust
 
 # cross-compile using clang/llvm: https://github.com/briansmith/ring/issues/1414#issuecomment-1055177218
-RUN apt-get update && apt-get -y install musl-tools clang llvm
+RUN apt-get update && apt-get -y install libssl-dev musl-tools clang llvm
 
 ENV CC_aarch64_unknown_linux_musl=clang
 ENV AR_aarch64_unknown_linux_musl=llvm-ar
