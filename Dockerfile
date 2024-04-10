@@ -1,16 +1,11 @@
 FROM --platform=$BUILDPLATFORM rust:1.77 AS rust
 
-# cross-compile using clang/llvm: https://github.com/briansmith/ring/issues/1414#issuecomment-1055177218
-RUN apt-get update && apt-get -y install musl-tools clang llvm
-
-ENV CC_aarch64_unknown_linux_musl=clang
-ENV AR_aarch64_unknown_linux_musl=llvm-ar
-ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
+RUN apt-get update && apt-get -y install libssl-dev clang llvm
 
 ARG TARGETPLATFORM
 RUN case "$TARGETPLATFORM" in \
-      "linux/arm64") echo aarch64-unknown-linux-musl > /target ;; \
-      "linux/amd64") echo x86_64-unknown-linux-musl > /target ;; \
+      "linux/arm64") echo aarch64-unknown-linux > /target ;; \
+      "linux/amd64") echo x86_64-unknown-linux > /target ;; \
       *) echo Unsupported architecture && exit 1 ;; \
     esac
 
@@ -43,7 +38,7 @@ ENV \
     # Show full backtraces for crashes.
     RUST_BACKTRACE=full
 RUN apk add --no-cache \
-      tini \
+      tini openssl \
     && rm -rf /var/cache/* \
     && mkdir /var/cache/apk
 WORKDIR /app
