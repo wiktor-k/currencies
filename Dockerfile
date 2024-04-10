@@ -4,8 +4,8 @@ RUN apt-get update && apt-get -y install libssl-dev clang llvm
 
 ARG TARGETPLATFORM
 RUN case "$TARGETPLATFORM" in \
-      "linux/arm64") echo aarch64-unknown-linux > /target ;; \
-      "linux/amd64") echo x86_64-unknown-linux > /target ;; \
+      "linux/arm64") echo aarch64-unknown-linux-gnu > /target ;; \
+      "linux/amd64") echo x86_64-unknown-linux-gnu > /target ;; \
       *) echo Unsupported architecture && exit 1 ;; \
     esac
 
