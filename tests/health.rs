@@ -8,7 +8,7 @@ async fn healthz_test() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let address = format!("http://127.0.0.1:{}/healthz", listener.local_addr()?.port());
     let _ = tokio::spawn(start("".into(), listener.into())?);
-    let client = awc::Client::default();
+    let client = reqwest::Client::default();
     let response = client.get(address).send().await.unwrap();
 
     assert_eq!(200, response.status().as_u16());
@@ -56,13 +56,13 @@ async fn frames_test() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let address = format!("http://127.0.0.1:{}/", listener.local_addr()?.port());
     let _ = tokio::spawn(start(format!("{}/source", mock.uri()), listener.into())?);
-    let client = awc::Client::default();
-    let mut response = client.get(address).send().await.unwrap();
+    let client = reqwest::Client::default();
+    let response = client.get(address).send().await.unwrap();
 
     assert_eq!(200, response.status().as_u16());
     assert_eq!(
         r#"{"frames":[{"text":"4.1279","icon":"i7792"},{"text":"4.3832","icon":"i4935"},{"text":"4.0986","icon":"i469"}]}"#,
-        response.body().await.unwrap()
+        response.text().await.unwrap()
     );
 
     Ok(())

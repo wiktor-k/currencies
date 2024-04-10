@@ -4,11 +4,7 @@ use actix_web::{
     web::{self, Data},
     App, HttpResponse, HttpServer, Responder,
 };
-use awc::{
-    error::{JsonPayloadError, SendRequestError},
-    Client,
-};
-
+use reqwest::Client;
 use serde::Serialize;
 use service_binding::Listener;
 
@@ -50,43 +46,25 @@ fn render_to_frames(tables: Vec<Table>) -> Vec<Frame<'static>> {
     frames
 }
 
-#[derive(Debug)]
-struct Error;
+#[derive(Debug, thiserror::Error)]
+enum Error {
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    #[error("Request error: {0}")]
+    Request(#[from] reqwest::Error),
+}
 
 impl actix_web::error::ResponseError for Error {}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<SendRequestError> for Error {
-    fn from(_: SendRequestError) -> Self {
-        Self
-    }
-}
-
-impl From<JsonPayloadError> for Error {
-    fn from(_: JsonPayloadError) -> Self {
-        Self
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(_: serde_json::Error) -> Self {
-        Self
-    }
-}
 
 async fn render(target: Data<String>, client: Data<Client>) -> Result<HttpResponse, Error> {
     let tables = client
         .get(target.get_ref())
-        .insert_header((
+        .header(
             "User-Agent",
             "currencies (+https://metacode.biz/@wiktor#currencies2)",
-        ))
-        .insert_header(("Accept", "application/json"))
+        )
+        .header("Accept", "application/json")
         .send()
         .await?
         .json::<Tables>()
