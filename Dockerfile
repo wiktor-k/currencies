@@ -7,8 +7,8 @@ WORKDIR /app
 # Cache dependencies: https://benjamincongdon.me/blog/2019/12/04/Fast-Rust-Docker-Builds-with-cargo-vendor/
 COPY Cargo.toml Cargo.lock ./
 
-#RUN mkdir .cargo
-#RUN cargo vendor --locked > .cargo/config
+RUN mkdir .cargo
+RUN cargo vendor --locked > .cargo/config
 
 COPY src ./src
 
