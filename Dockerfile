@@ -1,25 +1,6 @@
-FROM --platform=$BUILDPLATFORM rust:1.77-alpine AS rust
+FROM rust:1.77-alpine AS rust
 
-# cross-compile using clang/llvm: https://github.com/briansmith/ring/issues/1414#issuecomment-1055177218
-#RUN dpkg --add-architecture arm64
-#RUN apt-get update && apt-get -y install libssl-dev:arm64 openssl:arm64 musl-tools clang llvm pkg-config
-
-RUN apk add --no-cache musl-dev clang llvm openssl-dev openssl pkgconfig
-
-ENV CC_aarch64_unknown_linux_musl=clang
-ENV AR_aarch64_unknown_linux_musl=llvm-ar
-ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
-ENV PKG_CONFIG_ALLOW_CROSS_aarch64-unknown-linux-musl=1
-
-ARG TARGETPLATFORM
-RUN case "$TARGETPLATFORM" in \
-      "linux/arm64") echo aarch64-unknown-linux-musl > /target ;; \
-      "linux/amd64") echo x86_64-unknown-linux-musl > /target ;; \
-      *) echo Unsupported architecture && exit 1 ;; \
-    esac
-
-RUN rustup target add $(cat /target)
-#RUN rustup component add rustfmt clippy
+RUN apk add musl-dev openssl-dev
 
 WORKDIR /app
 
@@ -47,7 +28,7 @@ ENV \
     # Show full backtraces for crashes.
     RUST_BACKTRACE=full
 RUN apk add --no-cache \
-      tini \
+      tini openssl libgcc \
     && rm -rf /var/cache/* \
     && mkdir /var/cache/apk
 WORKDIR /app
