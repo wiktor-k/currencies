@@ -16,7 +16,7 @@ uuid = { version = "1.8", features = ["serde", "v4"] }
 service-binding = "2.0.0"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 json_typegen = "0.7.0"
-reqwest = { version = "0.12.3", features = ["json", "native-tls-vendored"] }
+reqwest = { version = "0.12.3", features = ["json", "rustls-tls"] }
 thiserror = "1.0.58"
 
 [dev-dependencies]
