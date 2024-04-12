@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM rust:1.77-alpine AS rust
+FROM rust:1.77-alpine AS rust
 
 # cross-compile using clang/llvm: https://github.com/briansmith/ring/issues/1414#issuecomment-1055177218
 #RUN dpkg --add-architecture arm64
@@ -6,19 +6,6 @@ FROM --platform=$BUILDPLATFORM rust:1.77-alpine AS rust
 
 RUN apk add musl-dev clang llvm openssl-dev openssl pkgconfig
 
-ENV CC_aarch64_unknown_linux_musl=clang
-ENV AR_aarch64_unknown_linux_musl=llvm-ar
-ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
-ENV PKG_CONFIG_ALLOW_CROSS_aarch64-unknown-linux-musl=1
-
-ARG TARGETPLATFORM
-RUN case "$TARGETPLATFORM" in \
-      "linux/arm64") echo aarch64-unknown-linux-musl > /target ;; \
-      "linux/amd64") echo x86_64-unknown-linux-musl > /target ;; \
-      *) echo Unsupported architecture && exit 1 ;; \
-    esac
-
-RUN rustup target add $(cat /target)
 #RUN rustup component add rustfmt clippy
 
 WORKDIR /app
@@ -36,9 +23,9 @@ COPY src ./src
 #  cargo clippy --locked -- -D warnings
 
 ENV SOURCE_DATE_EPOCH=1
-RUN PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target $(cat /target)
+RUN PKG_CONFIG_ALLOW_CROSS=1 cargo build --release
 
-RUN cp target/$(cat /target)/release/main .
+RUN cp target/release/main .
 
 RUN sha256sum main
 
