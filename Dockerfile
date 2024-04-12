@@ -4,7 +4,7 @@ FROM rust:1.77-alpine AS rust
 #RUN dpkg --add-architecture arm64
 #RUN apt-get update && apt-get -y install libssl-dev:arm64 openssl:arm64 musl-tools clang llvm pkg-config
 
-RUN apk add musl-dev clang llvm openssl-dev openssl pkgconfig
+RUN apk add --no-cache musl-dev clang llvm openssl-dev openssl pkgconfig
 
 #RUN rustup component add rustfmt clippy
 
@@ -23,7 +23,7 @@ COPY src ./src
 #  cargo clippy --locked -- -D warnings
 
 ENV SOURCE_DATE_EPOCH=1
-RUN PKG_CONFIG_ALLOW_CROSS=1 cargo build --release
+RUN RUSTFLAGS="-Ctarget-feature=-crt-static" cargo build --release
 
 RUN cp target/release/main .
 
