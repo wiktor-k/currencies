@@ -1,3 +1,4 @@
+use awc::Client;
 use currencies::start;
 use std::net::TcpListener;
 use wiremock::matchers::{header, method, path};
@@ -8,7 +9,7 @@ async fn healthz_test() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let address = format!("http://127.0.0.1:{}/healthz", listener.local_addr()?.port());
     let _ = tokio::spawn(start("".into(), listener.into())?);
-    let client = reqwest::Client::default();
+    let client = Client::default();
     let response = client.get(address).send().await.unwrap();
 
     assert_eq!(200, response.status().as_u16());
@@ -56,13 +57,13 @@ async fn frames_test() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let address = format!("http://127.0.0.1:{}/", listener.local_addr()?.port());
     let _ = tokio::spawn(start(format!("{}/source", mock.uri()), listener.into())?);
-    let client = reqwest::Client::default();
-    let response = client.get(address).send().await.unwrap();
+    let client = Client::default();
+    let mut response = client.get(address).send().await.unwrap();
 
     assert_eq!(200, response.status().as_u16());
     assert_eq!(
         r#"{"frames":[{"text":"4.1279","icon":"i7792"},{"text":"4.3832","icon":"i4935"},{"text":"4.0986","icon":"i469"}]}"#,
-        response.text().await.unwrap()
+        response.body().await.unwrap()
     );
 
     Ok(())

@@ -4,7 +4,7 @@ use actix_web::{
     web::{self, Data},
     App, HttpResponse, HttpServer, Responder,
 };
-use reqwest::Client;
+use awc::Client;
 use serde::Serialize;
 use service_binding::Listener;
 
@@ -51,8 +51,11 @@ enum Error {
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
 
-    #[error("Request error: {0}")]
-    Request(#[from] reqwest::Error),
+    #[error("Send request error: {0}")]
+    Request(#[from] awc::error::SendRequestError),
+
+    #[error("JSON payload error: {0}")]
+    JsonPayload(#[from] awc::error::JsonPayloadError),
 }
 
 impl actix_web::error::ResponseError for Error {}
@@ -60,11 +63,11 @@ impl actix_web::error::ResponseError for Error {}
 async fn render(target: Data<String>, client: Data<Client>) -> Result<HttpResponse, Error> {
     let tables = client
         .get(target.get_ref())
-        .header(
+        .insert_header((
             "User-Agent",
             "currencies (+https://metacode.biz/@wiktor#currencies2)",
-        )
-        .header("Accept", "application/json")
+        ))
+        .insert_header(("Accept", "application/json"))
         .send()
         .await?
         .json::<Tables>()
