@@ -12,15 +12,15 @@ serde = { version = "1", features = ["derive"] }
 serde_derive = "1"
 serde_json = "1"
 env_logger = "0.11.3"
-uuid = { version = "1.8", features = ["serde", "v4"] }
-service-binding = "2.0.0"
-clap = { version = "4.5.4", features = ["derive", "env"] }
+uuid = { version = "1.10", features = ["serde", "v4"] }
+service-binding = "3.0.0"
+clap = { version = "4.5.9", features = ["derive", "env"] }
 json_typegen = "0.7.0"
-thiserror = "1.0.58"
-awc = { version = "3.4.0", default-features = false, features = ["rustls"] }
+thiserror = "1.0.61"
+awc = { version = "3.5.0", default-features = false, features = ["rustls"] }
 
 [dev-dependencies]
-actix-rt = "2.9"
+actix-rt = "2.10"
 testresult = "0.4.0"
 wiremock = "0.6"
 
