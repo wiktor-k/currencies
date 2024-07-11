@@ -26,6 +26,9 @@ jobs:
         with:
           context: .
           push: true
+          # disable provenance as this makes the build non-reproducible
+          # see: https://mastodon.social/@AkihiroSuda/112763272875221223
+          provenance: false
           outputs: "type=image,name=target,annotation-index.org.opencontainers.image.description=${{ github.event.repository.description }},annotation-index.org.opencontainers.image.title=${{ github.event.repository.name }},annotation-index.org.opencontainers.image.revision=${{ github.sha }},annotation-index.org.opencontainers.image.source=${{ github.event.repository.url }}"
           tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64,linux/arm64
