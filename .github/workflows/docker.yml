@@ -21,14 +21,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set source date for reproducible builds
+        run: echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           # disable provenance as this makes the build non-reproducible
-          # see: https://mastodon.social/@AkihiroSuda/112763272875221223
+          # see: https://mastodon.social/@AkihiroSuda/112767337043899778
           provenance: false
+          build-args: SOURCE_DATE_EPOCH=${{ env.SOURCE_DATE_EPOCH }}
           outputs: "type=image,name=target,annotation-index.org.opencontainers.image.description=${{ github.event.repository.description }},annotation-index.org.opencontainers.image.title=${{ github.event.repository.name }},annotation-index.org.opencontainers.image.revision=${{ github.sha }},annotation-index.org.opencontainers.image.source=${{ github.event.repository.url }}"
           tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64,linux/arm64
