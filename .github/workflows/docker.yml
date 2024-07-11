@@ -21,16 +21,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Dump vars context
-        env:
-          VARS_JSON: ${{ toJSON(github) }}
-        run: echo "${VARS_JSON}"
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=My multi-arch image
+          outputs: "type=image,name=target,annotation-index.org.opencontainers.image.description=${{ github.event.repository.description }},annotation-index.org.opencontainers.image.title=${{ github.event.repository.name }},annotation-index.org.opencontainers.image.revision=${{ github.sha }},annotation-index.org.opencontainers.image.source=${{ github.event.repository.url }}"
           tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64,linux/arm64
           # see: https://blacksmith.sh/blog/cache-is-king-a-guide-for-docker-layer-caching-in-github-actions
