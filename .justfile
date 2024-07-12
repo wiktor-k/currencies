@@ -38,8 +38,7 @@ docs:
 
 # Build docker image
 docker-build extra-args='--iidfile /tmp/image-id':
-    docker buildx build \
-    --build-arg SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) \
+    SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) docker buildx build \
     --platform linux/amd64,linux/arm64 \
     --output type=image,rewrite-timestamp=true,name=target,annotation-index.org.opencontainers.image.revision=$(git rev-parse HEAD) \
     --provenance false \
