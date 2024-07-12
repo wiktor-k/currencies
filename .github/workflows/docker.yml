@@ -20,6 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Update runc
+        run: sudo apt-get update && sudo apt-get -y upgrade containerd.io
+
       - name: Setup Docker
         uses: docker-practice/actions-setup-docker@master
         with:
@@ -46,5 +49,4 @@ jobs:
 
       - name: Build and push Docker image
         run: >
-          just docker-build "--push --tag ghcr.io/${{ github.repository }}:latest"
-          #--cache-from type=registry,ref=ghcr.io/${{ github.repository }}:buildcache --cache-to type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max --iidfile=$GITHUB_STEP_SUMMARY"
+          just docker-build "--push --tag ghcr.io/${{ github.repository }}:latest --cache-from type=registry,ref=ghcr.io/${{ github.repository }}:buildcache --cache-to type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max --iidfile=$GITHUB_STEP_SUMMARY"
