@@ -39,4 +39,4 @@ jobs:
 
       - name: Build and push Docker image
         run: >
-          just docker-build "--push --tag ghcr.io/${{ github.repository }}:latest --cache-from type=registry,ref=ghcr.io/${{ github.repository }}:buildcache --cache-to type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max"
+          just docker-build "--push --tag ghcr.io/${{ github.repository }}:latest --cache-from type=registry,ref=ghcr.io/${{ github.repository }}:buildcache --cache-to type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max --iidfile=$GITHUB_STEP_SUMMARY"

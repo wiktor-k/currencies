@@ -1,1 +1,5 @@
 target
+.justfile
+.github
+.git
+.gitignore
