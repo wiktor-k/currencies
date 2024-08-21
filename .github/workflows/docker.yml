@@ -20,7 +20,7 @@ jobs:
       image: archlinux
     steps:
       - name: Setup docker on Arch
-        run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker git just
+        run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker docker-buildx git just
 
       - name: Workaround for git safedirs
         # see: https://stackoverflow.com/q/73408170
