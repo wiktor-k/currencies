@@ -16,17 +16,14 @@ jobs:
   build:
     name: Build Docker image
     runs-on: ubuntu-latest
+    container:
+      image: archlinux
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Update runc
-        run: sudo apt-get update && sudo apt-get -y upgrade containerd.io
-
-      - name: Setup Docker
-        uses: docker-practice/actions-setup-docker@master
-        with:
-          docker_version: 27.0.3
+      - name: Setup docker on Arch
+        run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -35,8 +32,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.15.1
 
       - name: Login to Github repository
         uses: docker/login-action@v3
