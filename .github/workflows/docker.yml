@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux
+      options: --user 1001
     steps:
       - name: Setup docker on Arch
         run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker git
