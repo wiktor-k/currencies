@@ -21,7 +21,7 @@ jobs:
       options: --user 1001
     steps:
       - name: Setup docker on Arch
-        run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker git
+        run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker git just
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,8 +40,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: taiki-e/install-action@just
 
       - name: Build and push Docker image
         run: >
