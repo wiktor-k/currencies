@@ -39,7 +39,7 @@ docs:
 # Build docker image
 docker-build extra-args='--iidfile /tmp/image-id':
     #!/usr/bin/bash
-    set -euxo pipefail
+    set -Eeuxo pipefail
 
     docker buildx build \
     --build-arg SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) \
