@@ -18,10 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux
-      options: --user 1001
     steps:
       - name: Setup docker on Arch
         run: pacman -Sy --needed --noconfirm archlinux-keyring && pacman -Syu --needed --noconfirm docker git just
+
+      - name: Workaround for git safedirs
+        # see: https://stackoverflow.com/q/73408170
+        run: git config --global --add safe.directory '*'
 
       - name: Checkout
         uses: actions/checkout@v4
